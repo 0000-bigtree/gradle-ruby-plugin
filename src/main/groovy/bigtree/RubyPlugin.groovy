@@ -16,11 +16,13 @@ class RubyPlugin implements Plugin<Project> {
         
     project.task('installRuby') << {
       extractDistr(project)
+      setExecutable(project)
     }
     
     project.task('reinstallRuby') << {
       deleteRubyHome(project)    
       extractDistr(project)
+      setExecutable(project)
     }    
         
     project.task('uninstallRuby') << {
@@ -48,7 +50,17 @@ class RubyPlugin implements Plugin<Project> {
       compression: 'gzip',
       dest: project.rubyEnv.extractPath)           
     }
-  }    
+  }
+  
+  // *nix下，要设置这些脚本的可执行权限
+  def setExecutable(project) {
+    def cmd = "500 ast gem irb jgem jirb jirb_swing jruby jruby.bash jruby.sh jrubyc rake rdoc ri testrb"
+    project.ant.exec(dir: "${project.rubyEnv.rubyHome}/bin", 
+                     executable: 'chmod', 
+                     osfamily: 'unix') {
+                       arg(line: cmd)      
+                     }    
+  }  
 
   
   static isWindows() {
