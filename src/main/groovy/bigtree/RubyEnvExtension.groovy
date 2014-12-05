@@ -3,22 +3,34 @@ package bigtree
 import org.gradle.api.Project
 
 class RubyEnvExtension {
-  final String ruby = 'jruby' // ruby interpreter, options is jruby and ruby(MRI), current only 'jruby'
-  String rubyVer = '1.7.16.1'  
-  String rubyHome
+  // ruby interpreter, options is jruby and ruby(MRI), current only 'jruby'
+  final String ruby = 'jruby' 
+  
+  String rubyVer = '1.7.16'
+  
+  String extractPath
+  
   String rubyDistrDependency
   //
   Project project
 
   def getRubyHome() {
-    project?.projectDir.getAbsolutePath() + '/' + ruby + '-' + rubyVer
+    getExtractPath() + '/' + ruby + '-' + rubyVer
+  }
+  
+  def getExtractPath() {
+    if (null == extractPath || 0 == extractPath.length()) {
+      return project.projectDir.getAbsolutePath()        
+    }
+    extractPath
   }
   
   def getRubyDistrDependency() {
     if((null == rubyDistrDependency || 0 ==  rubyDistrDependency.length())
     && ('jruby' ==  ruby)) {
-      return "org.jruby:jruby-dist:${rubyVer}@zip"
+      final ext = RubyPlugin.isWindows() ? 'zip' : 'tar.gz'
+      return "org.jruby:jruby-dist:${rubyVer}:bin@${ext}"
     }
     rubyDistrDependency
-  }  
+  }
 }
