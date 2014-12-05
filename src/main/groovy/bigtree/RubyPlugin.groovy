@@ -17,16 +17,40 @@ class RubyPlugin implements Plugin<Project> {
     project.task('installRuby') << {
       extractDistr(project)
       setExecutable(project)
+      changeToDefaultGemSource(project)
     }
     
     project.task('reinstallRuby') << {
       deleteRubyHome(project)    
       extractDistr(project)
       setExecutable(project)
+      changeToDefaultGemSource(project)
     }    
         
     project.task('uninstallRuby') << {
       deleteRubyHome(project)    
+    }
+    
+    project.task('addOfficialGemSource') << {
+      addOrRemoveGemSource(project, true, project.rubyEnv.officialGemSource)    
+    }
+    
+    project.task('addGemSource') << {  
+      if (project.hasProperty('gemSource')) {
+        final fromArg = project.getProperty('gemSource')
+        if (null != fromArg && 0 < fromArg.length()) {
+          addOrRemoveGemSource(project, true, fromArg)
+        }
+      }      
+    }
+    
+    project.task('removeGemSource') << {  
+      if (project.hasProperty('gemSource')) {
+        final fromArg = project.getProperty('gemSource')
+        if (null != fromArg && 0 < fromArg.length()) {
+          addOrRemoveGemSource(project, false, fromArg)
+        }
+      }      
     }
   }
   
@@ -61,7 +85,28 @@ class RubyPlugin implements Plugin<Project> {
                        arg(line: cmd)      
                      }    
   }  
+  
+  // 添加 Gem 源 URL
+  def addOrRemoveGemSource(project, isAdd, source) {
+    def flag = isAdd ? '-a' : '-r'
+    def cmd = "-S gem sources -c ${flag} ${source}"
+    def executable = getRubyExecutableWithPath(project)
+    project.ant.exec(executable: executable) {
+        env(key: 'HOME', value: project.rubyEnv.rubyHome)
+        env(key: 'JRUBY_HOME', value: project.rubyEnv.rubyHome)
+        arg(line: cmd)      
+    } 
+  }    
+  
+  def changeToDefaultGemSource(project) {
+    addOrRemoveGemSource(project, false, project.rubyEnv.officialGemSource)
+    addOrRemoveGemSource(project, true, project.rubyEnv.defaultGemSource)   
+  }
 
+  def getRubyExecutableWithPath(project) {
+    def executable = isWindows() ? "jruby.exe" : "jruby"
+    "${project.rubyEnv.rubyHome}/bin/${executable}"
+  }
   
   static isWindows() {
     Os.isFamily(Os.FAMILY_WINDOWS)      

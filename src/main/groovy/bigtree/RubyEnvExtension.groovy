@@ -8,23 +8,17 @@ class RubyEnvExtension {
   
   String rubyVer = '1.7.16'
   
+  String rubyDistrDependency
+  
   String extractPath
   
-  String rubyDistrDependency
+  final String officialGemSource = 'https://rubygems.org/'
+  
+  String defaultGemSource = 'http://ruby.taobao.org/'
+  
   //
   Project project
 
-  def getRubyHome() {
-    getExtractPath() + '/' + ruby + '-' + rubyVer
-  }
-  
-  def getExtractPath() {
-    if (null == extractPath || 0 == extractPath.length()) {
-      return project.projectDir.getAbsolutePath()        
-    }
-    extractPath
-  }
-  
   def getRubyDistrDependency() {
     if((null == rubyDistrDependency || 0 ==  rubyDistrDependency.length())
     && ('jruby' ==  ruby)) {
@@ -32,5 +26,16 @@ class RubyEnvExtension {
       return "org.jruby:jruby-dist:${rubyVer}:bin@${ext}"
     }
     rubyDistrDependency
-  }
+  } 
+  
+  def getExtractPath() {
+    if (null == extractPath || 0 == extractPath.length()) {
+      return project.projectDir.getAbsolutePath()        
+    }
+    extractPath
+  }  
+
+  def getRubyHome() {
+    getExtractPath() + '/' + ruby + '-' + rubyVer
+  }  
 }
