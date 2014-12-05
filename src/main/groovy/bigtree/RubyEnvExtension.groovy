@@ -16,6 +16,8 @@ class RubyEnvExtension {
   
   String defaultGemSource = 'http://ruby.taobao.org/'
   
+  String defaultGems = 'rubygems-update rake bundler'
+  
   //
   Project project
 

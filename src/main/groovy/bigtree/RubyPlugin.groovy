@@ -18,6 +18,7 @@ class RubyPlugin implements Plugin<Project> {
       extractDistr(project)
       setExecutable(project)
       changeToDefaultGemSource(project)
+      installDefaultGems(project)
     }
     
     project.task('reinstallRuby') << {
@@ -25,6 +26,7 @@ class RubyPlugin implements Plugin<Project> {
       extractDistr(project)
       setExecutable(project)
       changeToDefaultGemSource(project)
+      installDefaultGems(project)
     }    
         
     project.task('uninstallRuby') << {
@@ -106,6 +108,23 @@ class RubyPlugin implements Plugin<Project> {
   def getRubyExecutableWithPath(project) {
     def executable = isWindows() ? "jruby.exe" : "jruby"
     "${project.rubyEnv.rubyHome}/bin/${executable}"
+  }
+  
+  def installDefaultGems(project) {
+    def gems = project.rubyEnv.defaultGems
+    if (null != gems && 0 < gems.length()) {
+      installGems(project, gems)
+    }
+  }
+  
+  def installGems(project, gems) {
+    def cmd = "-S gem install ${gems} -N"
+    def executable = getRubyExecutableWithPath(project)
+    project.ant.exec(executable: executable) {
+      env(key: 'HOME', value: project.rubyEnv.rubyHome)
+      env(key: 'JRUBY_HOME', value: project.rubyEnv.rubyHome)
+      arg(line: cmd)      
+    } 
   }
   
   static isWindows() {
