@@ -1,0 +1,9 @@
+target
+build
+.DS_Store
+.gradle
+**/gradle-app.setting
+.nb-gradle
+private
+.nb-gradle-properties
+catalog.xml
