@@ -1,6 +1,7 @@
 package bigtree
 
-import org.gradle.api.*
+import org.gradle.api.Project
+import org.gradle.api.Plugin
 
 class RubyPlugin implements Plugin<Project> {
   
@@ -9,10 +10,10 @@ class RubyPlugin implements Plugin<Project> {
     rubyEnv.project = project
         
     project.task('installRuby') << {
-      println "$project.info.prefix: $project.gradle.gradleVersion"
     }
+    
+        
     project.task('uninstallRuby') << {
-      println "$project.info.prefix: $project.gradle.gradleVersion"
     }
   }
 }

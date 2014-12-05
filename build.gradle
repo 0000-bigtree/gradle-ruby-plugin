@@ -1,11 +1,9 @@
 group = 'bigtree'
 version = '0.1.0'
 
+apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-apply plugin: 'groovy'
-
-archivesBaseName = 'ruby-plugin'
 
 repositories {
   mavenLocal()
@@ -14,6 +12,6 @@ repositories {
 
 dependencies {
   compile gradleApi()
-  // groovy localGroovy()
-  testCompile group: 'junit', name: 'junit', version: '4.10'
+  compile localGroovy()
+  testCompile group: 'junit', name: 'junit', version: '4.12'
 }
