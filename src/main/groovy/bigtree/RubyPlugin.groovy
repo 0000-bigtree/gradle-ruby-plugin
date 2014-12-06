@@ -10,6 +10,9 @@ class RubyPlugin implements Plugin<Project> {
     def rubyEnv = project.extensions.create('rubyEnv', RubyEnvExtension)
     rubyEnv.project = project
     
+    def rubyProject = project.extensions.create('rubyProject', RubyProjectExtension)
+    rubyProject.project = project    
+    
     project.configurations {
       rubyDistrDependency
     }
@@ -54,6 +57,52 @@ class RubyPlugin implements Plugin<Project> {
         }
       }      
     }
+    
+    project.task('newProject') << {  
+        def gems = project.rubyProject.defaultGems
+        if (null != gems && 0 < gems.length()) {
+          installGems(project, gems)
+        }
+        if (project.rubyProject.isRailsProject) {
+          println project.rubyProject.isRailsProject
+          println project.rubyProject.nameWithPath
+          
+          // 如果是 rails 项目，利用 rails new 命令来创建项目
+          def cmd = "-S rails new ${project.rubyProject.nameWithPath}"
+          def executable = getRubyExecutableWithPath(project)
+          ant.exec(executable: executable) {
+            env(key: 'HOME', value: project.rubyEnv.rubyHome)
+            env(key: 'JRUBY_HOME', value: project.rubyEnv.rubyHome)
+            arg(line: cmd)
+          } 
+          // 将 rails 生成的 Gemfile中的 Gem Source 替换为指定的 Source
+          def source = project.rubyProject.gemfileSource 
+          if (null == source || 0 >= source) {
+            source = project.rubyEnv.defaultGemSource
+          } 
+          if (null == source || 0 >= source) {
+            source = project.rubyEnv.officialGemSource
+          }
+          replaceGemfileSource("${project.rubyProject.nameWithPath}/Gemfile", source)
+        } else {
+          // 非 rails 项目 
+        }
+      }
+
+      project.task('exec') << {  
+        if (project.hasProperty('cmds')) {
+          def cmds = project.cmds
+          cmds.split(';').each {
+            def cmd = "-S ${it}"
+            ant.exec(dir: project.rubyProject.nameWithPath, 
+                     executable: getRubyExecutableWithPath(project)) {
+              env(key: 'HOME', value: project.rubyEnv.rubyHome)
+              env(key: 'JRUBY_HOME', value: project.rubyEnv.rubyHome)
+              arg(line: cmd)
+            }
+          }          
+        }
+      }        
   }
   
   def deleteRubyHome(project) {
@@ -106,8 +155,13 @@ class RubyPlugin implements Plugin<Project> {
   }
 
   def getRubyExecutableWithPath(project) {
-    def executable = isWindows() ? "jruby.exe" : "jruby"
-    "${project.rubyEnv.rubyHome}/bin/${executable}"
+    if ('jruby' == project.rubyEnv.ruby) {
+      def executable = isWindows() ? "jruby.exe" : "jruby"
+      "${project.rubyEnv.rubyHome}/bin/${executable}"
+    } else {
+      def executable = isWindows() ? "ruby.exe" : "ruby"
+      "${project.rubyEnv.rubyHome}/bin/${executable}"      
+    }
   }
   
   def installDefaultGems(project) {
@@ -127,7 +181,15 @@ class RubyPlugin implements Plugin<Project> {
     } 
   }
   
+  def replaceGemfileSource(gemfileWithPath, source) {
+    def contents = new File(gemfileWithPath).getText()
+    def newFile = new File(gemfileWithPath)
+    newFile.setText("source '${source}'")
+    newFile << System.getProperty("line.separator") 
+    newFile << "# " << contents
+  }  
+  
   static isWindows() {
-    Os.isFamily(Os.FAMILY_WINDOWS)      
+    Os.isFamily(Os.FAMILY_WINDOWS)
   }    
 }

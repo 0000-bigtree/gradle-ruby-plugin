@@ -10,7 +10,7 @@ class RubyEnvExtension {
   
   String rubyDistrDependency
   
-  String extractPath
+  String extractPath = 'rubybin'
   
   final String officialGemSource = 'https://rubygems.org/'
   
@@ -34,7 +34,7 @@ class RubyEnvExtension {
     if (null == extractPath || 0 == extractPath.length()) {
       return project.projectDir.getAbsolutePath()        
     }
-    extractPath
+    new File(project.projectDir, extractPath).getAbsolutePath()
   }  
 
   def getRubyHome() {
