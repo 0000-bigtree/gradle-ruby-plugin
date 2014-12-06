@@ -64,9 +64,6 @@ class RubyPlugin implements Plugin<Project> {
           installGems(project, gems)
         }
         if (project.rubyProject.isRailsProject) {
-          println project.rubyProject.isRailsProject
-          println project.rubyProject.nameWithPath
-          
           // 如果是 rails 项目，利用 rails new 命令来创建项目
           def cmd = "-S rails new ${project.rubyProject.nameWithPath} --skip-bundle ${project.rubyProject.railsNewArgs}"
           def executable = getRubyExecutableWithPath(project)
@@ -86,6 +83,10 @@ class RubyPlugin implements Plugin<Project> {
           replaceGemfileSource(project, "${project.rubyProject.nameWithPath}/Gemfile", source)
         } else {
           // 非 rails 项目 
+          new File(project.rubyProject.nameWithPath).mkdirs()
+          if (project.rubyProject.isCreateGemfile) {
+            createNewGemfile(project, "${project.rubyProject.nameWithPath}/Gemfile")
+          }
         }
       }
 
@@ -191,12 +192,20 @@ class RubyPlugin implements Plugin<Project> {
   }  
   
   def createNewGemfile(project, gemfileWithPath) {
-    gemfile = file(gemfileWithPath)
-    if(!gemfile.isExists()) {
-      gemfile.createNew()
+    def gemfile = new File(gemfileWithPath)
+    if(!gemfile.exists()) {
+      gemfile.createNewFile()
     }
     gemfile.setText('')
-    gemfile << ''
+    def source = project.rubyProject.gemfileSource 
+    if (null == source || 0 >= source.length()) {
+      source = project.rubyEnv.defaultGemSource
+    } 
+    if (null == source || 0 >= source.length()) {
+      source = project.rubyEnv.officialGemSource
+    }    
+    gemfile << "source '${source}'"
+    gemfile << "${System.getProperty("line.separator")}ruby '${project.rubyEnv.rubyVer}', engine: '${project.rubyEnv.engine}', engine_version: '${project.rubyEnv.engineVer}'"
   }
   
   static isWindows() {

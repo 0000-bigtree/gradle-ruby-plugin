@@ -22,7 +22,7 @@ class RubyProjectExtension {
   Project project  
   
   def getDefaultGems() {
-    isRailsProject ? "${defaultGems} rails:${railsVer}" : defaultsGems
+    isRailsProject ? "${defaultGems} rails:${railsVer}" : defaultGems
   }
   
   def getNameWithPath() {
