@@ -8,9 +8,11 @@ class RubyProjectExtension {
     
   boolean isRailsProject = false
   
+  boolean isCreateGemfile = true
+  
   String railsVer = ''
   
-  String newRailsArgs = ''
+  String railsNewArgs = ''
     
   String gemfileSource
   
@@ -33,5 +35,13 @@ class RubyProjectExtension {
     }
     nameWithPath
   }  
+  
+  def isCreateGemfile() {
+    if (isRailsProject) {
+      false
+    } else {
+      isCreateGemfile
+    }
+  }
   
 }

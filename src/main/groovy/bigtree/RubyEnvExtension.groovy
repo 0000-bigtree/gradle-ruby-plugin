@@ -4,9 +4,11 @@ import org.gradle.api.Project
 
 class RubyEnvExtension {
   // ruby interpreter, options is jruby and ruby(MRI), current only 'jruby'
-  final String ruby = 'jruby' 
+  final String engine = 'jruby' 
   
-  String rubyVer = '1.7.16'
+  String engineVer = '1.9.16'
+  
+  String rubyVer = '1.9.3'
   
   String rubyDistrDependency
   
@@ -16,16 +18,16 @@ class RubyEnvExtension {
   
   String defaultGemSource = 'http://ruby.taobao.org/'
   
-  String defaultGems = 'rubygems-update rake bundler'
+  String defaultGems //= 'rubygems-update rake bundler'
   
   //
   Project project
 
   def getRubyDistrDependency() {
     if((null == rubyDistrDependency || 0 ==  rubyDistrDependency.length())
-    && ('jruby' ==  ruby)) {
+    && ('jruby' ==  engine)) {
       final ext = RubyPlugin.isWindows() ? 'zip' : 'tar.gz'
-      return "org.jruby:jruby-dist:${rubyVer}:bin@${ext}"
+      return "org.jruby:jruby-dist:${engineVer}:bin@${ext}"
     }
     rubyDistrDependency
   } 
@@ -38,6 +40,6 @@ class RubyEnvExtension {
   }  
 
   def getRubyHome() {
-    getExtractPath() + '/' + ruby + '-' + rubyVer
+    getExtractPath() + '/' + engine + '-' + engineVer
   }  
 }

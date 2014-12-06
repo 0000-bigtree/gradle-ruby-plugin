@@ -68,7 +68,7 @@ class RubyPlugin implements Plugin<Project> {
           println project.rubyProject.nameWithPath
           
           // 如果是 rails 项目，利用 rails new 命令来创建项目
-          def cmd = "-S rails new ${project.rubyProject.nameWithPath}"
+          def cmd = "-S rails new ${project.rubyProject.nameWithPath} --skip-bundle ${project.rubyProject.railsNewArgs}"
           def executable = getRubyExecutableWithPath(project)
           ant.exec(executable: executable) {
             env(key: 'HOME', value: project.rubyEnv.rubyHome)
@@ -77,13 +77,13 @@ class RubyPlugin implements Plugin<Project> {
           } 
           // 将 rails 生成的 Gemfile中的 Gem Source 替换为指定的 Source
           def source = project.rubyProject.gemfileSource 
-          if (null == source || 0 >= source) {
+          if (null == source || 0 >= source.length()) {
             source = project.rubyEnv.defaultGemSource
           } 
-          if (null == source || 0 >= source) {
+          if (null == source || 0 >= source.length()) {
             source = project.rubyEnv.officialGemSource
           }
-          replaceGemfileSource("${project.rubyProject.nameWithPath}/Gemfile", source)
+          replaceGemfileSource(project, "${project.rubyProject.nameWithPath}/Gemfile", source)
         } else {
           // 非 rails 项目 
         }
@@ -155,7 +155,7 @@ class RubyPlugin implements Plugin<Project> {
   }
 
   def getRubyExecutableWithPath(project) {
-    if ('jruby' == project.rubyEnv.ruby) {
+    if ('jruby' == project.rubyEnv.engine) {
       def executable = isWindows() ? "jruby.exe" : "jruby"
       "${project.rubyEnv.rubyHome}/bin/${executable}"
     } else {
@@ -181,13 +181,23 @@ class RubyPlugin implements Plugin<Project> {
     } 
   }
   
-  def replaceGemfileSource(gemfileWithPath, source) {
+  def replaceGemfileSource(project, gemfileWithPath, source) {
     def contents = new File(gemfileWithPath).getText()
+    contents = contents.replace("rubygems.org'", "rubygems.org'${System.getProperty("line.separator")}ruby '${project.rubyEnv.rubyVer}', engine: '${project.rubyEnv.engine}', engine_version: '${project.rubyEnv.engineVer}'")
     def newFile = new File(gemfileWithPath)
     newFile.setText("source '${source}'")
     newFile << System.getProperty("line.separator") 
     newFile << "# " << contents
   }  
+  
+  def createNewGemfile(project, gemfileWithPath) {
+    gemfile = file(gemfileWithPath)
+    if(!gemfile.isExists()) {
+      gemfile.createNew()
+    }
+    gemfile.setText('')
+    gemfile << ''
+  }
   
   static isWindows() {
     Os.isFamily(Os.FAMILY_WINDOWS)
