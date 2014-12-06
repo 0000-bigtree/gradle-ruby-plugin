@@ -18,6 +18,7 @@ class RubyPlugin implements Plugin<Project> {
     }
         
     project.task('installRuby') << {
+      description 'Install Ruby'
       extractDistr(project)
       setExecutable(project)
       changeToDefaultGemSource(project)
@@ -25,6 +26,7 @@ class RubyPlugin implements Plugin<Project> {
     }
     
     project.task('reinstallRuby') << {
+      description 'Reinstall Ruby, will delete installed Ruby previously'
       deleteRubyHome(project)    
       extractDistr(project)
       setExecutable(project)
@@ -33,6 +35,7 @@ class RubyPlugin implements Plugin<Project> {
     }    
         
     project.task('uninstallRuby') << {
+      description 'Uninstall Ruby, will delete installed Ruby'        
       deleteRubyHome(project)    
     }
     
