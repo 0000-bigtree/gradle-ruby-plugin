@@ -258,7 +258,7 @@ class RubyPlugin implements Plugin<Project> {
   
   def exec(project, cmd) {
     def executable = getRubyExecutableWithPath(project)
-    project.ant.exec(executable: executable) {
+    project.ant.exec(dir: project.rubyProject.nameWithPath, executable: executable) {
       env(key: 'HOME', value: project.rubyEnv.rubyHome)
       env(key: 'JRUBY_HOME', value: project.rubyEnv.rubyHome)
       arg(line: cmd)
