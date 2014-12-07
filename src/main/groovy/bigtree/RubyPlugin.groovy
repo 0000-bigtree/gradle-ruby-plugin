@@ -96,7 +96,7 @@ class RubyPlugin implements Plugin<Project> {
       }
       
       project.task('rails') << {
-        def args = project.getProperty('args')
+        def args = project.hasProperty('args') ? project.getProperty('args') : ''
         if (null == args || 0 >= args.length()) {
           args = ''
         }
@@ -105,7 +105,7 @@ class RubyPlugin implements Plugin<Project> {
       }      
       
       project.task('rackup') << {
-        def args = project.getProperty('args')
+        def args = project.hasProperty('args') ? project.getProperty('args') : ''
         if (null == args || 0 >= args.length()) {
           args = ''
         }
@@ -114,7 +114,7 @@ class RubyPlugin implements Plugin<Project> {
       }  
       
       project.task('rake') << {
-        def args = project.getProperty('args')
+        def args = project.hasProperty('args') ? project.getProperty('args') : ''
         if (null == args || 0 >= args.length()) {
           args = ''
         }
@@ -123,7 +123,7 @@ class RubyPlugin implements Plugin<Project> {
       }      
       
       project.task('bundle') << {
-        def args = project.getProperty('args')
+        def args = project.hasProperty('args') ? project.getProperty('args') : ''
         if (null == args || 0 >= args.length()) {
           args = ''
         }
@@ -132,7 +132,7 @@ class RubyPlugin implements Plugin<Project> {
       }      
       
       project.task('gem') << {
-        def args = project.getProperty('args')
+        def args = project.hasProperty('args') ? project.getProperty('args') : ''
         if (null == args || 0 >= args.length()) {
           args = 'env'
         }
