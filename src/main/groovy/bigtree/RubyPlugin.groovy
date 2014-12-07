@@ -3,6 +3,7 @@ package bigtree
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.Plugin
+// 1. 遗留，当项目未创建时，执行命令，其当前目录应选择为HOME，而不是项目目录
 
 class RubyPlugin implements Plugin<Project> {
   
@@ -88,22 +89,27 @@ class RubyPlugin implements Plugin<Project> {
           // 非 rails 项目 
           new File(project.rubyProject.nameWithPath).mkdirs()
           if (project.rubyProject.isCreateGemfile) {
+            installGems(project, 'bundler')
             createNewGemfile(project, "${project.rubyProject.nameWithPath}/Gemfile")
           }
         }
       }
+      
+      project.task('rails') << {
+        def args = project.getProperty('args')
+        if (null == args || 0 >= args.length()) {
+          args = ''
+        }
+        def cmd = "-S rails ${args}"
+        exec(project, cmd)
+      }      
 
       project.task('exec') << {  
         if (project.hasProperty('cmds')) {
           def cmds = project.cmds
           cmds.split(';').each {
             def cmd = "-S ${it}"
-            ant.exec(dir: project.rubyProject.nameWithPath, 
-                     executable: getRubyExecutableWithPath(project)) {
-              env(key: 'HOME', value: project.rubyEnv.rubyHome)
-              env(key: 'JRUBY_HOME', value: project.rubyEnv.rubyHome)
-              arg(line: cmd)
-            }
+            exec(project, cmd)
           }          
         }
       }        
@@ -209,6 +215,18 @@ class RubyPlugin implements Plugin<Project> {
     }    
     gemfile << "source '${source}'"
     gemfile << "${System.getProperty("line.separator")}ruby '${project.rubyEnv.rubyVer}', engine: '${project.rubyEnv.engine}', engine_version: '${project.rubyEnv.engineVer}'"
+    gemfile << System.getProperty("line.separator") * 2
+    gemfile << "# gem 'log4r', '~> 1.1.10'${System.getProperty("line.separator")}"
+    gemfile << "# gem 'puma', '~> 2.10.2'${System.getProperty("line.separator")}"    
+  }
+  
+  def exec(project, cmd) {
+    def executable = getRubyExecutableWithPath(project)
+    project.ant.exec(executable: executable) {
+      env(key: 'HOME', value: project.rubyEnv.rubyHome)
+      env(key: 'JRUBY_HOME', value: project.rubyEnv.rubyHome)
+      arg(line: cmd)
+    }    
   }
   
   static isWindows() {
