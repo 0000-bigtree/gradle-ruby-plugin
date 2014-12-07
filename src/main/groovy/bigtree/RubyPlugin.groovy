@@ -103,6 +103,42 @@ class RubyPlugin implements Plugin<Project> {
         def cmd = "-S rails ${args}"
         exec(project, cmd)
       }      
+      
+      project.task('rackup') << {
+        def args = project.getProperty('args')
+        if (null == args || 0 >= args.length()) {
+          args = ''
+        }
+        def cmd = "-S rackup ${args}"
+        exec(project, cmd)
+      }  
+      
+      project.task('rake') << {
+        def args = project.getProperty('args')
+        if (null == args || 0 >= args.length()) {
+          args = ''
+        }
+        def cmd = "-S rake ${args}"
+        exec(project, cmd)
+      }      
+      
+      project.task('bundle') << {
+        def args = project.getProperty('args')
+        if (null == args || 0 >= args.length()) {
+          args = ''
+        }
+        def cmd = "-S bundle ${args}"
+        exec(project, cmd)
+      }      
+      
+      project.task('gem') << {
+        def args = project.getProperty('args')
+        if (null == args || 0 >= args.length()) {
+          args = 'env'
+        }
+        def cmd = "-S gem ${args}"
+        exec(project, cmd)
+      }      
 
       project.task('exec') << {  
         if (project.hasProperty('cmds')) {
