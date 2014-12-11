@@ -85,14 +85,16 @@ class RubyPlugin implements Plugin<Project> {
             source = project.rubyEnv.officialGemSource
           }
           replaceGemfileSource(project, "${project.rubyProject.nameWithPath}/Gemfile", source)
+          
+          // 执行 bundle，安装 gem
+          exec(project, "-S bundle")              
         } else {
           // 非 rails 项目 
           new File(project.rubyProject.nameWithPath).mkdirs()
           if (project.rubyProject.isCreateGemfile) {
-            installGems(project, 'bundler')
             createNewGemfile(project, "${project.rubyProject.nameWithPath}/Gemfile")
           }
-        }
+        }    
       }
       
       project.task('rails') << {
