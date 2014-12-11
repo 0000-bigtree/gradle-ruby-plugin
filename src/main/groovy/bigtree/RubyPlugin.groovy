@@ -116,7 +116,7 @@ class RubyPlugin implements Plugin<Project> {
       project.task('rake') << {
         def args = project.hasProperty('args') ? project.getProperty('args') : ''
         if (null == args || 0 >= args.length()) {
-          args = ''
+          args = '-T'
         }
         def cmd = "-S rake ${args}"
         exec(project, cmd)
@@ -134,7 +134,7 @@ class RubyPlugin implements Plugin<Project> {
       project.task('gem') << {
         def args = project.hasProperty('args') ? project.getProperty('args') : ''
         if (null == args || 0 >= args.length()) {
-          args = 'env'
+          args = 'list --local'
         }
         def cmd = "-S gem ${args}"
         exec(project, cmd)
@@ -212,13 +212,18 @@ class RubyPlugin implements Plugin<Project> {
   
   def installDefaultGems(project) {
     def gems = project.rubyEnv.defaultGems
-    if (null != gems && 0 < gems.length()) {
-      installGems(project, gems)
+    if (null == gems || 0 >= gems.length()) {
+      gems = ''
     }
+    gems += ' bundler '
+    if('jruby' == project.rubyEnv.engine) {
+      gems += ' warbler '      
+    }
+    installGems(project, gems)
   }
   
   def installGems(project, gems) {
-    def cmd = "-S gem install ${gems} -N"
+    def cmd = "-S gem install ${gems} -N -V"
     def executable = getRubyExecutableWithPath(project)
     project.ant.exec(executable: executable) {
       env(key: 'HOME', value: project.rubyEnv.rubyHome)
