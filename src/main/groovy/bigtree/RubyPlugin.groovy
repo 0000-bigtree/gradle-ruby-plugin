@@ -101,12 +101,12 @@ class RubyPlugin implements Plugin<Project> {
         }
       }
       
-      project.task('war') << {
+      project.task('war', type: org.gradle.api.tasks.bundling.War) << {
         // 准备好 assets
         def cmd = "-S rake assets:clobber assets:precompile"
         exec(project, cmd)
         // 打包为 war
-        cmd = "-S warble war"
+        cmd = "-S warble compiled war"
         exec(project, cmd)
         
         // 移动到生成的 war 包到 project.buildDir
@@ -114,7 +114,7 @@ class RubyPlugin implements Plugin<Project> {
         def name = f.name
         name = (name[0].toLowerCase() + name.substring(1) + '.war')
         def warFileWithPath = new File(f, name)
-        ant.move(file: warFileWithPath, tofile: "${project.buildDir}/${project.name}-${project.version}.war")
+        ant.move(file: warFileWithPath, tofile: "${project.buildDir}/libs/${project.name}-${project.version}.war")
       }
       
       project.task('rails') << {
