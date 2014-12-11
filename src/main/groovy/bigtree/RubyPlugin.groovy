@@ -103,7 +103,7 @@ class RubyPlugin implements Plugin<Project> {
       
       project.task('war', type: org.gradle.api.tasks.bundling.War) << {
         // 准备好 assets
-        def cmd = "-S rake assets:clobber assets:precompile"
+        def cmd = "-S rake assets:clobber assets:precompile RAILS_ENV=production"
         exec(project, cmd)
         // 打包为 war
         cmd = "-S warble compiled war"
