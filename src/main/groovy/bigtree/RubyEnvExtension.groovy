@@ -6,7 +6,7 @@ class RubyEnvExtension {
   // ruby interpreter, options is jruby and ruby(MRI), current only 'jruby'
   final String engine = 'jruby' 
   
-  String engineVer = '1.9.16'
+  String engineVer = '1.9.17'
   
   String rubyVer = '1.9.3'
   

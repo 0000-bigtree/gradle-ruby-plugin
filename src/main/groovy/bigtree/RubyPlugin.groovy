@@ -46,7 +46,7 @@ class RubyPlugin implements Plugin<Project> {
     
     project.task('addGemSource') << {  
       if (project.hasProperty('gemSource')) {
-        final fromArg = project.getProperty('gemSource')
+        final fromArg = project.gemSource
         if (null != fromArg && 0 < fromArg.length()) {
           addOrRemoveGemSource(project, true, fromArg)
         }
@@ -55,7 +55,7 @@ class RubyPlugin implements Plugin<Project> {
     
     project.task('removeGemSource') << {  
       if (project.hasProperty('gemSource')) {
-        final fromArg = project.getProperty('gemSource')
+        final fromArg = project.gemSource
         if (null != fromArg && 0 < fromArg.length()) {
           addOrRemoveGemSource(project, false, fromArg)
         }
@@ -96,7 +96,7 @@ class RubyPlugin implements Plugin<Project> {
       }
       
       project.task('rails') << {
-        def args = project.hasProperty('args') ? project.getProperty('args') : ''
+        def args = project.hasProperty('args') ? project.args : ''
         if (null == args || 0 >= args.length()) {
           args = ''
         }
@@ -105,7 +105,7 @@ class RubyPlugin implements Plugin<Project> {
       }      
       
       project.task('rackup') << {
-        def args = project.hasProperty('args') ? project.getProperty('args') : ''
+        def args = project.hasProperty('args') ? project.args : ''
         if (null == args || 0 >= args.length()) {
           args = ''
         }
@@ -114,16 +114,16 @@ class RubyPlugin implements Plugin<Project> {
       }  
       
       project.task('rake') << {
-        def args = project.hasProperty('args') ? project.getProperty('args') : ''
+        def args = project.hasProperty('args') ? project.args : ''
         if (null == args || 0 >= args.length()) {
-          args = '-T'
+          args = ''
         }
         def cmd = "-S rake ${args}"
         exec(project, cmd)
       }      
       
       project.task('bundle') << {
-        def args = project.hasProperty('args') ? project.getProperty('args') : ''
+        def args = project.hasProperty('args') ? project.args : ''
         if (null == args || 0 >= args.length()) {
           args = ''
         }
@@ -132,7 +132,7 @@ class RubyPlugin implements Plugin<Project> {
       }      
       
       project.task('gem') << {
-        def args = project.hasProperty('args') ? project.getProperty('args') : ''
+        def args = project.hasProperty('args') ? project.args : ''
         if (null == args || 0 >= args.length()) {
           args = 'list --local'
         }

@@ -42,6 +42,5 @@ class RubyProjectExtension {
     } else {
       isCreateGemfile
     }
-  }
-  
+  }  
 }
