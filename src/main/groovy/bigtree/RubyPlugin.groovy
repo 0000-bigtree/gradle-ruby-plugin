@@ -87,14 +87,34 @@ class RubyPlugin implements Plugin<Project> {
           replaceGemfileSource(project, "${project.rubyProject.nameWithPath}/Gemfile", source)
           
           // 执行 bundle，安装 gem
-          exec(project, "-S bundle")              
+          exec(project, "-S bundle")   
         } else {
           // 非 rails 项目 
           new File(project.rubyProject.nameWithPath).mkdirs()
           if (project.rubyProject.isCreateGemfile) {
             createNewGemfile(project, "${project.rubyProject.nameWithPath}/Gemfile")
           }
-        }    
+        }
+        if('jruby' == project.rubyEnv.engine) {
+          // 执行 warble config，生成 warble 配置文件 
+          exec(project, "-S warble config")
+        }
+      }
+      
+      project.task('war') << {
+        // 准备好 assets
+        def cmd = "-S rake assets:clobber assets:precompile"
+        exec(project, cmd)
+        // 打包为 war
+        cmd = "-S warble war"
+        exec(project, cmd)
+        
+        // 移动到生成的 war 包到 project.buildDir
+        def f = new File(project.rubyProject.nameWithPath)
+        def name = f.name
+        name = (name[0].toLowerCase() + name.substring(1) + '.war')
+        def warFileWithPath = new File(f, name)
+        ant.move(file: warFileWithPath, tofile: "${project.buildDir}/${project.name}-${project.version}.war")
       }
       
       project.task('rails') << {
