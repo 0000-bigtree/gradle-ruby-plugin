@@ -105,8 +105,9 @@ class RubyPlugin implements Plugin<Project> {
         // 准备好 assets
         def cmd = "-S rake assets:clobber assets:precompile RAILS_ENV=production"
         exec(project, cmd)
-        // 打包为 war
-        cmd = "-S warble compiled war"
+        // 编译并打包为 war
+        // 当前的 warble 版本 1.4.4 执行 warble compiled war， 在 windows 下会报错
+        cmd = isWindows() ? "-S warble war" : "-S warble compiled war"
         exec(project, cmd)
         
         // 移动到生成的 war 包到 project.buildDir
