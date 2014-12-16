@@ -3,11 +3,14 @@ package bigtree
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.plugins.BasePlugin
+
 // 1. 遗留，当项目未创建时，执行命令，其当前目录应选择为HOME，而不是项目目录
 
 class RubyPlugin implements Plugin<Project> {
   
   void apply(Project project) {
+    project.plugins.apply(BasePlugin)
     def rubyEnv = project.extensions.create('rubyEnv', RubyEnvExtension)
     rubyEnv.project = project
     
@@ -17,6 +20,12 @@ class RubyPlugin implements Plugin<Project> {
     project.configurations {
       rubyDistrDependency
     }
+    
+    project.task('build') {
+      description  'Assembles and tests this project.'    
+      group  'build'
+      dependsOn project.assemble
+    }      
         
     project.task('installRuby') << {
       description 'Install Ruby'
