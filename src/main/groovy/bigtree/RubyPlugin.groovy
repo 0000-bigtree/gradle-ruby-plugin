@@ -102,7 +102,15 @@ class RubyPlugin implements Plugin<Project> {
             createNewGemfile(project, "${project.rubyProject.nameWithPath}/Gemfile")
           }
         }
+        if (project.rubyProject.isCreateJarfile) {
+          createNewJarfile(project, "${project.rubyProject.nameWithPath}/Jarfile")
+          exec(project, "-S jbundle install")
+        }
         if('jruby' == project.rubyEnv.engine) {
+          def configDir = new File(project.rubyProject.nameWithPath, 'config')
+          if(!configDir.exists()) {
+            configDir.mkdir()
+          }
           // 执行 warble config，生成 warble 配置文件 
           exec(project, "-S warble config")
         }
@@ -247,7 +255,7 @@ class RubyPlugin implements Plugin<Project> {
     }
     gems += ' bundler '
     if('jruby' == project.rubyEnv.engine) {
-      gems += ' warbler '      
+      gems += ' jbundler warbler '
     }
     installGems(project, gems)
   }
@@ -288,8 +296,23 @@ class RubyPlugin implements Plugin<Project> {
     gemfile << "${System.getProperty("line.separator")}ruby '${project.rubyEnv.rubyVer}', engine: '${project.rubyEnv.engine}', engine_version: '${project.rubyEnv.engineVer}'"
     gemfile << System.getProperty("line.separator") * 2
     gemfile << "# gem 'log4r', '~> 1.1.10'${System.getProperty("line.separator")}"
-    gemfile << "# gem 'puma', '~> 2.10.2'${System.getProperty("line.separator")}"    
+    gemfile << "# gem 'puma', '~> 2.10.2'${System.getProperty("line.separator")}"
+    if('jruby' == project.rubyEnv.engine) {
+      gemfile << "# gem 'jbundler'${System.getProperty("line.separator")}"
+    }
   }
+  
+  def createNewJarfile(project, jarfileWithPath) {
+    def jarfile = new File(jarfileWithPath)
+    if(!jarfile.exists()) {
+      jarfile.createNewFile()
+    }
+    jarfile.setText('')
+    jarfile << System.getProperty("line.separator")
+    jarfile << "# pom 'my.group:my-artifact-id', '=1.2.3'${System.getProperty("line.separator")}"
+    jarfile << "# jar 'my.group.id:artifact-id', '>1.2.3'${System.getProperty("line.separator")}"
+    jarfile << "# jar 'my.group:artifact-id', '>1.2.3', '=<2.0.1'${System.getProperty("line.separator")}"
+  }  
   
   def exec(project, cmd) {
     def executable = getRubyExecutableWithPath(project)

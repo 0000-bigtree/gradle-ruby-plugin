@@ -10,6 +10,8 @@ class RubyProjectExtension {
   
   boolean isCreateGemfile = true
   
+  boolean isCreateJarfile = true
+  
   String railsVer = ''
   
   String railsNewArgs = ''
