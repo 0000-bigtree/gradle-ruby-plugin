@@ -169,6 +169,15 @@ class RubyPlugin implements Plugin<Project> {
         exec(project, cmd)
       }      
       
+      project.task('jbundle') << {
+        def args = project.hasProperty('args') ? project.args : ''
+        if (null == args || 0 >= args.length()) {
+          args = ''
+        }
+        def cmd = "-S jbundle ${args}"
+        exec(project, cmd)
+      }
+
       project.task('gem') << {
         def args = project.hasProperty('args') ? project.args : ''
         if (null == args || 0 >= args.length()) {
