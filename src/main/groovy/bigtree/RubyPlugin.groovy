@@ -264,7 +264,7 @@ class RubyPlugin implements Plugin<Project> {
     }
     gems += ' bundler '
     if('jruby' == project.rubyEnv.engine) {
-      gems += ' jbundler warbler '
+      gems += ' ruby-maven-libs ruby-maven warbler jbundler '
     }
     installGems(project, gems)
   }
@@ -304,11 +304,11 @@ class RubyPlugin implements Plugin<Project> {
     gemfile << "source '${source}'"
     gemfile << "${System.getProperty("line.separator")}ruby '${project.rubyEnv.rubyVer}', engine: '${project.rubyEnv.engine}', engine_version: '${project.rubyEnv.engineVer}'"
     gemfile << System.getProperty("line.separator") * 2
-    gemfile << "# gem 'log4r', '~> 1.1.10'${System.getProperty("line.separator")}"
-    gemfile << "# gem 'puma', '~> 2.10.2'${System.getProperty("line.separator")}"
     if('jruby' == project.rubyEnv.engine) {
       gemfile << "# gem 'jbundler'${System.getProperty("line.separator")}"
     }
+    gemfile << "# gem 'log4r', '~> 1.1.10'${System.getProperty("line.separator")}"
+    gemfile << "# gem 'puma', '~> 2.10.2'${System.getProperty("line.separator")}"
   }
   
   def createNewJarfile(project, jarfileWithPath) {
