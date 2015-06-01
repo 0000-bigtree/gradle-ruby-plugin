@@ -7,3 +7,9 @@ build
 private
 .nb-gradle-properties
 catalog.xml
+**/*.iml
+.idea/
+rubybin
+activate.cmd
+deactivate.cmd
+ruby.cmd

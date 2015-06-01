@@ -1,0 +1,30 @@
+buildscript { 
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+  }
+  
+  dependencies {
+    classpath "bigtree:rubyPlugin:0.1.0"
+  }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+  jcenter()
+}
+
+apply plugin: 'bigtree.ruby'
+
+rubyEnv {
+  engineVer = '1.7.20'
+  defaultGemSource = 'http://ruby.taobao.org/'
+}
+
+rubyProject {
+  nameWithPath = '.'  
+  isRailsProject = true
+  railsVer = '4.2.1'  
+}

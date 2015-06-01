@@ -31,6 +31,7 @@ class RubyPlugin implements Plugin<Project> {
       setExecutable(project)
       changeToDefaultGemSource(project)
       installDefaultGems(project)
+      generateActivateScripts(project)
     }
     
     project.task('reinstallRuby') << {
@@ -40,7 +41,8 @@ class RubyPlugin implements Plugin<Project> {
       setExecutable(project)
       changeToDefaultGemSource(project)
       installDefaultGems(project)
-    }    
+      generateActivateScripts(project)
+    }
         
     project.task('uninstallRuby') << {
       description 'Uninstall Ruby, will delete installed Ruby'        
@@ -267,6 +269,36 @@ class RubyPlugin implements Plugin<Project> {
       gems += ' ruby-maven-libs ruby-maven warbler jbundler '
     }
     installGems(project, gems)
+  }
+
+  def generateActivateScripts(project){
+    if (isWindows()){
+      // 激活和去激活 JRuby 环境的 Windows 批处理脚本
+      final rubyHomePath = new File(project.rubyEnv.rubyHome).getCanonicalPath()
+      final activateScript = new File(project.rubyProject.nameWithPath, "activate.cmd")
+      if (!activateScript.exists()) {
+        activateScript << """@IF DEFINED _OLD_PATH (
+    SET "PATH=%_OLD_PATH%"
+) ELSE (
+    SET "_OLD_PATH=%PATH%"
+)
+@SET "PATH=${rubyHomePath}\\bin;%PATH%"
+"""
+      }
+      final deactivate = new File(project.rubyProject.nameWithPath, "deactivate.cmd")
+      if (!deactivate.exists()) {
+        deactivate << """@IF DEFINED _OLD_PATH (
+  SET "PATH=%_OLD_PATH%"
+  SET _OLD_PATH=
+)
+"""
+      }
+      final ruby = new File(project.rubyProject.nameWithPath, "ruby.cmd")
+      if (!ruby.exists()) {
+        ruby << """@jruby %*
+"""
+      }
+    }
   }
   
   def installGems(project, gems) {
